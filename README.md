@@ -4,7 +4,7 @@ Aplicação web desenvolvida em **Laravel** para gestão de reservas de veículo
 
 ---
 
-## 📖 Visão Geral
+## Visão Geral
 
 Sistema para criação e gestão de reservas de veículos com:
 
@@ -17,9 +17,9 @@ O foco principal é garantir consistência entre frontend e backend.
 
 ---
 
-## 👥 Tipos de Utilizador
+## Tipos de Utilizador
 
-### 👤 Cliente
+### Cliente
 - Criar reservas
 - Consultar reservas próprias
 - Ver disponibilidade em tempo real
@@ -33,7 +33,7 @@ O foco principal é garantir consistência entre frontend e backend.
 
 ---
 
-## ⚙️ Funcionalidades
+## Funcionalidades
 
 - ✔ Verificação de conflitos de datas
 - ✔ Validação de datas (frontend + backend)
@@ -44,17 +44,17 @@ O foco principal é garantir consistência entre frontend e backend.
 
 ---
 
-## 🧠 Regras de Negócio
+## Regras de Negócio
 
-### 📅 Datas
+### Datas
 - Data início não pode ser no passado
 - Data fim deve ser superior à data início
 
-### 🚫 Conflitos
+### Conflitos
 - Não permite reservas sobrepostas
 - Considera todos os cenários (intervalos incluídos)
 
-### 💰 Cálculo de custo
+### Cálculo de custo
 
 - Baseado em preço diário
 - Conversão para horas
@@ -67,7 +67,7 @@ dias * preço_diário + horas_restantes * (preço_diário / 24)
 
 ---
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 - Laravel 12
 - PHP 8.2
@@ -77,7 +77,7 @@ dias * preço_diário + horas_restantes * (preço_diário / 24)
 
 ---
 
-## 🗂️ Estrutura
+## Estrutura
 
 app/
 - Http/Controllers/
@@ -94,7 +94,7 @@ resources/views/
 
 ---
 
-## 🔌 Endpoints
+## Endpoints
 
 - GET /reservas → listar
 - POST /reservas → criar
@@ -106,7 +106,7 @@ resources/views/
 
 ---
 
-## 🚀 Instalação
+## Instalação
 
 git clone https://github.com/teu-username/teu-repo.git  
 cd teu-repo  
@@ -123,7 +123,7 @@ php artisan serve
 
 ---
 
-## 🔐 Autenticação
+## Autenticação
 
 Baseado em sistema Laravel:
 
@@ -132,7 +132,7 @@ funcionario (boolean)
 
 ---
 
-## 🧪 Validação em Tempo Real
+## Validação em Tempo Real
 
 Fluxo:
 
@@ -143,7 +143,7 @@ Fluxo:
 
 ---
 
-## 🎯 Pontos Fortes
+## Pontos Fortes
 
 - Validação dupla (frontend + backend)
 - Lógica de negócio consistente
@@ -152,7 +152,7 @@ Fluxo:
 
 ---
 
-## ⚠️ Limitações
+## Limitações
 
 - Sem middleware de roles dedicado
 - UI ainda simples
@@ -160,7 +160,7 @@ Fluxo:
 
 ---
 
-## 🔮 Melhorias Futuras
+## Melhorias Futuras
 
 - Sistema de roles e middleware
 - Dashboard com estatísticas
@@ -170,6 +170,6 @@ Fluxo:
 
 ---
 
-## 📄 Licença
+## Licença
 
 Projeto académico.
