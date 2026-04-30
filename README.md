@@ -1,59 +1,175 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚗 Rent a Car — Sistema de Gestão de Reservas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicação web desenvolvida em **Laravel** para gestão de reservas de veículos, com separação de permissões entre clientes e funcionários e validação completa de regras de negócio.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📖 Visão Geral
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Sistema para criação e gestão de reservas de veículos com:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Validação de datas
+- Verificação de conflitos
+- Cálculo automático de custos
+- Feedback em tempo real
 
-## Learning Laravel
+O foco principal é garantir consistência entre frontend e backend.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 👥 Tipos de Utilizador
 
-## Laravel Sponsors
+### 👤 Cliente
+- Criar reservas
+- Consultar reservas próprias
+- Ver disponibilidade em tempo real
+- Ver custo estimado antes de reservar
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 🧑‍💼 Funcionário
+- Criar, editar e eliminar reservas
+- Concluir reservas
+- Gerir veículos
+- Ver todas as reservas
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## ⚙️ Funcionalidades
 
-## Contributing
+- ✔ Verificação de conflitos de datas
+- ✔ Validação de datas (frontend + backend)
+- ✔ Cálculo automático de custo
+- ✔ Preview em tempo real
+- ✔ Bloqueio de submissão inválida
+- ✔ Interface dinâmica por tipo de utilizador
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🧠 Regras de Negócio
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 📅 Datas
+- Data início não pode ser no passado
+- Data fim deve ser superior à data início
 
-## Security Vulnerabilities
+### 🚫 Conflitos
+- Não permite reservas sobrepostas
+- Considera todos os cenários (intervalos incluídos)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 💰 Cálculo de custo
 
-## License
+- Baseado em preço diário
+- Conversão para horas
+- +1 hora se exceder 30 minutos
+- Mínimo de 1 hora
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Fórmula:
+
+dias * preço_diário + horas_restantes * (preço_diário / 24)
+
+---
+
+## 🛠️ Tecnologias
+
+- Laravel 12
+- PHP 8.2
+- PostgreSQL
+- Blade
+- JavaScript (Vanilla)
+
+---
+
+## 🗂️ Estrutura
+
+app/
+- Http/Controllers/
+  - ReservaController.php
+  - VeiculoController.php
+- Models/
+  - Reserva.php
+  - Veiculo.php
+
+resources/views/
+- reservas/
+- veiculos/
+- home.blade.php
+
+---
+
+## 🔌 Endpoints
+
+- GET /reservas → listar
+- POST /reservas → criar
+- PUT /reservas/{id} → atualizar
+- DELETE /reservas/{id} → eliminar
+- PUT /reservas/{id}/concluir → concluir
+- POST /reservas/check → verificar disponibilidade
+- POST /reservas/preview → calcular custo
+
+---
+
+## 🚀 Instalação
+
+git clone https://github.com/teu-username/teu-repo.git  
+cd teu-repo  
+
+composer install  
+
+cp .env.example .env  
+php artisan key:generate  
+
+Configurar base de dados no .env  
+
+php artisan migrate  
+php artisan serve  
+
+---
+
+## 🔐 Autenticação
+
+Baseado em sistema Laravel:
+
+Campo usado:
+funcionario (boolean)
+
+---
+
+## 🧪 Validação em Tempo Real
+
+Fluxo:
+
+1. Utilizador escolhe datas
+2. Validação local (JS)
+3. Pedido ao backend (/reservas/check)
+4. UI atualiza automaticamente
+
+---
+
+## 🎯 Pontos Fortes
+
+- Validação dupla (frontend + backend)
+- Lógica de negócio consistente
+- Prevenção de conflitos robusta
+- Estrutura organizada
+
+---
+
+## ⚠️ Limitações
+
+- Sem middleware de roles dedicado
+- UI ainda simples
+- Sem API pública documentada
+
+---
+
+## 🔮 Melhorias Futuras
+
+- Sistema de roles e middleware
+- Dashboard com estatísticas
+- Notificações
+- API REST completa
+- UI moderna (Tailwind / Vue)
+
+---
+
+## 📄 Licença
+
+Projeto académico.
