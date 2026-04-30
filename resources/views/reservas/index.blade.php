@@ -25,24 +25,20 @@
         </div>
 
         {{-- STATS --}}
-        <div class="grid grid-cols-3 gap-3 mb-6">
+        <div class="grid gap-3 mb-6" style="grid-template-columns: repeat(3, 1fr);">
             <div class="bg-white rounded-xl border border-slate-200 p-4">
-                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Total este mês</p>
-                <p class="text-xl font-bold" style="color:#1e40af;">
-                    € {{ number_format($reservas->sum('custo_total'), 2, ',', '.') }}
-                </p>
+                    <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Total este mês</p>
+                    <p class="text-xl font-bold" style="color:#1e40af;">
+                        € {{ number_format($reservas->sum('custo_total'), 2, ',', '.') }}
+                    </p>
             </div>
             <div class="bg-white rounded-xl border border-slate-200 p-4">
                 <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Ativas</p>
-                <p class="text-xl font-bold text-green-600">
-                    {{ $reservas->where('id_estado_reserva', 1)->count() }}
-                </p>
+                <p class="text-xl font-bold text-green-600">{{ $reservas->where('id_estado_reserva', 1)->count() }}</p>
             </div>
             <div class="bg-white rounded-xl border border-slate-200 p-4">
                 <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Concluídas</p>
-                <p class="text-xl font-bold text-slate-800">
-                    {{ $reservas->where('id_estado_reserva', 2)->count() }}
-                </p>
+                <p class="text-xl font-bold text-slate-800">{{ $reservas->where('id_estado_reserva', 2)->count() }}</p>
             </div>
         </div>
 
