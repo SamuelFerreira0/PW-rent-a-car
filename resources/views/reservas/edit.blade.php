@@ -1,69 +1,111 @@
-<div style="max-width: 760px; margin: 32px auto; padding: 0 16px; font-family: Arial, sans-serif; color: #1f2937;">
+<x-app-layout>
+<div class="min-h-screen py-8 px-4" style="background:#f8f9fb;">
+<div class="max-w-xl mx-auto">
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h1 style="margin: 0; font-size: 28px;">Editar Reserva</h1>
-
-        <a href="/reservas" style="text-decoration: none; color: #374151; border: 1px solid #d1d5db; padding: 8px 12px; border-radius: 8px; font-weight: 600;">
-            Voltar
+    {{-- HEADER --}}
+    <div class="flex justify-between items-center mb-7">
+        <div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Editar Reserva</h1>
+            <p class="text-sm text-slate-400 mt-0.5">
+                {{ $reserva->veiculo->marca }} {{ $reserva->veiculo->modelo }} · {{ $reserva->cliente->nome }}
+            </p>
+        </div>
+        <a href="/reservas"
+           class="text-xs font-semibold text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-300 bg-white px-4 py-2 rounded-xl transition-colors">
+            ← Voltar
         </a>
     </div>
 
-    @if ($errors->any())
-        <div style="margin-bottom: 16px; padding: 12px; background: #fee2e2; color: #991b1b; border-radius: 8px;">
-            <strong>Erros:</strong>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    {{-- ERROS --}}
+    @if($errors->any())
+    <div class="mb-5 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-700">
+        <p class="font-semibold mb-1">Corrige os seguintes erros:</p>
+        <ul class="list-disc list-inside space-y-0.5">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
 
-    <form method="POST" action="/reservas/{{ $reserva->id_reserva }}" style="background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px;">
-        @csrf
-        @method('PUT')
+    {{-- FORM CARD --}}
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
 
-        <div style="margin-bottom: 14px;">
-            <label style="font-weight: 600;">Cliente</label>
-            <select name="id_cliente" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
-                @foreach($clientes as $cliente)
-                    <option value="{{ $cliente->id_cliente }}"
-                        {{ $reserva->id_cliente == $cliente->id_cliente ? 'selected' : '' }}>
-                        {{ $cliente->nome }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+        <form method="POST" action="/reservas/{{ $reserva->id_reserva }}">
+            @csrf
+            @method('PUT')
 
-        <div style="margin-bottom: 14px;">
-            <label style="font-weight: 600;">Veículo</label>
-            <select name="id_veiculo" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
-                @foreach($veiculos as $veiculo)
-                    <option value="{{ $veiculo->id_veiculo }}"
-                        {{ $reserva->id_veiculo == $veiculo->id_veiculo ? 'selected' : '' }}>
-                        {{ $veiculo->marca }} {{ $veiculo->modelo }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+            <div class="p-6 flex flex-col gap-5">
 
-        <div style="margin-bottom: 14px;">
-            <label style="font-weight: 600;">Data início</label>
-            <input type="datetime-local" name="data_reserva"
-                value="{{ \Carbon\Carbon::parse($reserva->data_reserva)->format('Y-m-d\TH:i') }}"
-                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
-        </div>
+                {{-- CLIENTE --}}
+                <div>
+                    <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                        Cliente
+                    </label>
+                    <select name="id_cliente"
+                            class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                        @foreach($clientes as $cliente)
+                            <option value="{{ $cliente->id_cliente }}"
+                                {{ $reserva->id_cliente == $cliente->id_cliente ? 'selected' : '' }}>
+                                {{ $cliente->nome }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-        <div style="margin-bottom: 20px;">
-            <label style="font-weight: 600;">Data fim</label>
-            <input type="datetime-local" name="data_prevista"
-                value="{{ \Carbon\Carbon::parse($reserva->data_prevista)->format('Y-m-d\TH:i') }}"
-                style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;">
-        </div>
+                {{-- VEÍCULO --}}
+                <div>
+                    <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                        Veículo
+                    </label>
+                    <select name="id_veiculo"
+                            class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                        @foreach($veiculos as $veiculo)
+                            <option value="{{ $veiculo->id_veiculo }}"
+                                {{ $reserva->id_veiculo == $veiculo->id_veiculo ? 'selected' : '' }}>
+                                {{ $veiculo->marca }} {{ $veiculo->modelo }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-        <button type="submit" style="background: #2563eb; color: white; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer;">
-            Guardar Alterações
-        </button>
+                {{-- DATAS --}}
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                            Início
+                        </label>
+                        <input type="datetime-local" name="data_reserva"
+                               value="{{ \Carbon\Carbon::parse($reserva->data_reserva)->format('Y-m-d\TH:i') }}"
+                               class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                            Fim
+                        </label>
+                        <input type="datetime-local" name="data_prevista"
+                               value="{{ \Carbon\Carbon::parse($reserva->data_prevista)->format('Y-m-d\TH:i') }}"
+                               class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                    </div>
+                </div>
 
-    </form>
+            </div>
+
+            {{-- FOOTER DO CARD --}}
+            <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100" style="background:#fafbfc;">
+                <p class="text-xs text-slate-400">
+                    Reserva #{{ $reserva->id_reserva }}
+                </p>
+                <button type="submit"
+                        class="text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl transition-colors"
+                        style="background:#1e40af;">
+                    Guardar alterações
+                </button>
+            </div>
+
+        </form>
+    </div>
+
 </div>
+</div>
+</x-app-layout>
