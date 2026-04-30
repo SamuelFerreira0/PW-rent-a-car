@@ -1,4 +1,4 @@
-# 🚗 Rent a Car — Sistema de Gestão de Reservas
+# Rent a Car — Sistema de Gestão de Reservas
 
 Aplicação web desenvolvida em **Laravel** para gestão de reservas de veículos, com separação de permissões entre clientes e funcionários e validação completa de regras de negócio.
 
@@ -25,7 +25,7 @@ O foco principal é garantir consistência entre frontend e backend.
 - Ver disponibilidade em tempo real
 - Ver custo estimado antes de reservar
 
-### 🧑‍💼 Funcionário
+### Funcionário
 - Criar, editar e eliminar reservas
 - Concluir reservas
 - Gerir veículos
