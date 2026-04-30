@@ -104,7 +104,7 @@
     <div class="flex justify-between items-center mb-7">
         <div>
             <h1 class="text-xl font-bold text-slate-900 tracking-tight">
-                Olá, {{ auth()->user()->name }} 👋
+                Olá, {{ auth()->user()->name }}
             </h1>
             <p class="text-sm text-slate-400 mt-0.5">
                 {{ auth()->user()->funcionario ? 'Painel de gestão' : 'O teu painel de reservas' }}
