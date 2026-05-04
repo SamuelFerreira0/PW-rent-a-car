@@ -280,4 +280,16 @@ class ReservaController extends Controller
             ]);
         }
     }
+
+    public function show($id)
+    {
+        $reserva = Reserva::with('veiculo', 'cliente')->findOrFail($id);
+
+        if (!auth()->user()->funcionario &&
+            $reserva->id_cliente !== auth()->user()->cliente->id_cliente) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        return view('reservas.show', compact('reserva'));
+    }
 }

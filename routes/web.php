@@ -12,18 +12,28 @@ Route::get('/dashboard', function () {
     return redirect()->route('home');
 })->middleware('auth')->name('dashboard');
 
+
+// Todos os users
 Route::middleware(['auth'])->group(function () {
 
-    // RESERVAS
+    // RESERVAS (cliente pode usar)
     Route::get('/reservas', [ReservaController::class, 'index']);
     Route::get('/reservas/create', [ReservaController::class, 'create']);
     Route::post('/reservas', [ReservaController::class, 'store']);
     Route::post('/reservas/check', [ReservaController::class, 'checkDisponibilidade']);
+    Route::post('/reservas/preview', [ReservaController::class, 'preview']);
+    Route::get('/reservas/{id}', [ReservaController::class, 'show']);
+});
+
+
+// Só funcionãrios
+Route::middleware(['auth', 'isFuncionario'])->group(function () {
+
+    // RESERVAS ADMIN
     Route::get('/reservas/{id}/edit', [ReservaController::class, 'edit']);
     Route::put('/reservas/{id}', [ReservaController::class, 'update']);
     Route::delete('/reservas/{id}', [ReservaController::class, 'destroy']);
     Route::put('/reservas/{id}/concluir', [ReservaController::class, 'concluir']);
-    Route::post('/reservas/preview', [ReservaController::class, 'preview']);
 
     // VEICULOS
     Route::get('/veiculos', [VeiculoController::class, 'index']);

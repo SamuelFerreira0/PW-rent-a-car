@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->alias([
-            'funcionario' => \App\Http\Middleware\FuncionarioMiddleware::class,
+            'isFuncionario' => \App\Http\Middleware\IsFuncionario::class,
         ]);
     
     })
