@@ -166,6 +166,65 @@
 
     </div>
 
+    {{-- STATS DASHBOARD --}}
+    @if(auth()->user()->funcionario)
+
+    <div class="grid gap-3 mb-6" style="grid-template-columns: repeat(4, 1fr);">
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+            <p class="text-xs text-slate-400">Total Reservas</p>
+            <p class="text-xl font-bold text-slate-900">{{ $total ?? 0 }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+            <p class="text-xs text-slate-400">Ativas</p>
+            <p class="text-xl font-bold text-green-600">{{ $ativas ?? 0 }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+            <p class="text-xs text-slate-400">Concluídas</p>
+            <p class="text-xl font-bold text-slate-900">{{ $concluidas ?? 0 }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+            <p class="text-xs text-slate-400">Receita</p>
+            <p class="text-xl font-bold text-blue-600">
+                € {{ number_format($receita ?? 0, 2, ',', '.') }}
+            </p>
+        </div>
+
+    </div>
+
+    @else
+
+    <div class="grid gap-3 mb-6">
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+            <p class="text-xs text-slate-400">Total de Reservas</p>
+            <p class="text-xl font-bold text-slate-900">{{ $total ?? 0 }}</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+            <p class="text-xs text-slate-400 mb-1">Próxima Reserva</p>
+
+            @if(isset($proxima) && $proxima)
+                <p class="font-semibold text-slate-900">
+                    {{ \Carbon\Carbon::parse($proxima->data_reserva)->format('d/m/Y H:i') }}
+                </p>
+                <p class="text-xs text-slate-400">
+                    até {{ \Carbon\Carbon::parse($proxima->data_prevista)->format('d/m/Y H:i') }}
+                </p>
+            @else
+                <p class="text-slate-400 text-sm">
+                    Não tens reservas futuras
+                </p>
+            @endif
+        </div>
+
+    </div>
+
+    @endif
+
     {{-- FEATURES --}}
     <div class="grid gap-3" style="grid-template-columns: repeat(3, 1fr);">
 

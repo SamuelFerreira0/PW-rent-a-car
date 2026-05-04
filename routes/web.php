@@ -4,9 +4,42 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\VeiculoController;
 
+use App\Models\Reserva;
+use Carbon\Carbon;
+
 Route::get('/', function () {
-    return view('home');
-})->name('home');
+
+    if (!auth()->check()) {
+        return view('home');
+    }
+
+    $user = auth()->user();
+
+    if ($user->funcionario) {
+
+        $total = Reserva::count();
+        $ativas = Reserva::where('id_estado_reserva', 1)->count();
+        $concluidas = Reserva::where('id_estado_reserva', 2)->count();
+        $receita = Reserva::sum('custo_total');
+
+        return view('home', compact('total', 'ativas', 'concluidas', 'receita'));
+
+    } else {
+
+        $clienteId = $user->cliente->id_cliente;
+
+        $reservas = Reserva::where('id_cliente', $clienteId)->get();
+
+        $total = $reservas->count();
+
+        $proxima = $reservas
+            ->where('data_reserva', '>', now())
+            ->sortBy('data_reserva')
+            ->first();
+
+        return view('home', compact('total', 'proxima'));
+    }
+});
 
 Route::get('/dashboard', function () {
     return redirect()->route('home');
