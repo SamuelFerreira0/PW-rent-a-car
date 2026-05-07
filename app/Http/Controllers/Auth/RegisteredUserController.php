@@ -42,11 +42,19 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
         
+        do {
+            $nif = str_pad(rand(1, 999999999), 9, '0', STR_PAD_LEFT);
+        } while (\App\Models\Cliente::where('nif', $nif)->exists());
+
+        do {
+            $telefone = str_pad(rand(1, 999999999), 9, '0', STR_PAD_LEFT);
+        } while (\App\Models\Cliente::where('telefone', $telefone)->exists());
+
         \App\Models\Cliente::create([
             'nome' => $user->name,
             'email' => $user->email,
-            'nif' => '000000000',
-            'telefone' => '000000000',
+            'nif' => $nif,
+            'telefone' => $telefone,
             'id_morada' => 1,
             'id_user' => $user->id,
         ]);
