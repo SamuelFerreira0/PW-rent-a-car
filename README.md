@@ -106,32 +106,6 @@ resources/views/
 
 ---
 
-## Instalação
-
-git clone https://github.com/teu-username/teu-repo.git  
-cd teu-repo  
-
-composer install  
-
-cp .env.example .env  
-php artisan key:generate  
-
-Configurar base de dados no .env  
-
-php artisan migrate  
-php artisan serve  
-
----
-
-## Autenticação
-
-Baseado em sistema Laravel:
-
-Campo usado:
-funcionario (boolean)
-
----
-
 ## Validação em Tempo Real
 
 Fluxo:
@@ -149,24 +123,6 @@ Fluxo:
 - Lógica de negócio consistente
 - Prevenção de conflitos robusta
 - Estrutura organizada
-
----
-
-## Limitações
-
-- Sem middleware de roles dedicado
-- UI ainda simples
-- Sem API pública documentada
-
----
-
-## Melhorias Futuras
-
-- Sistema de roles e middleware
-- Dashboard com estatísticas
-- Notificações
-- API REST completa
-- UI moderna (Tailwind / Vue)
 
 ---
 
