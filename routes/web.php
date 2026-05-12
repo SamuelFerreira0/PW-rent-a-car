@@ -1,80 +1,52 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\VeiculoController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CatalogoController;
 
-use App\Models\Reserva;
-use Carbon\Carbon;
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/catalogo', [CatalogoController::class, 'index'])->name('catalogo.index');
 
-Route::get('/', function () {
+Route::get('/dashboard', fn() => redirect()->route('home'))
+    ->middleware('auth')
+    ->name('dashboard');
 
-    if (!auth()->check()) {
-        return view('home');
-    }
-
-    $user = auth()->user();
-
-    if ($user->funcionario) {
-
-        $total = Reserva::count();
-        $ativas = Reserva::where('id_estado_reserva', 1)->count();
-        $concluidas = Reserva::where('id_estado_reserva', 2)->count();
-        $receita = Reserva::sum('custo_total');
-
-        return view('home', compact('total', 'ativas', 'concluidas', 'receita'));
-
-    } else {
-
-        $clienteId = $user->cliente->id_cliente;
-
-        $reservas = Reserva::where('id_cliente', $clienteId)->get();
-
-        $total = $reservas->count();
-
-        $proxima = $reservas
-            ->where('data_reserva', '>', now())
-            ->sortBy('data_reserva')
-            ->first();
-
-        return view('home', compact('total', 'proxima'));
-    }
-});
-
-Route::get('/dashboard', function () {
-    return redirect()->route('home');
-})->middleware('auth')->name('dashboard');
-
-
-// Todos os users
+// Todos os utilizadores autenticados
 Route::middleware(['auth'])->group(function () {
 
-    // RESERVAS (cliente pode usar)
-    Route::get('/reservas', [ReservaController::class, 'index']);
-    Route::get('/reservas/create', [ReservaController::class, 'create']);
-    Route::post('/reservas', [ReservaController::class, 'store']);
-    Route::post('/reservas/check', [ReservaController::class, 'checkDisponibilidade']);
-    Route::post('/reservas/preview', [ReservaController::class, 'preview']);
-    Route::get('/reservas/{id}', [ReservaController::class, 'show']);
+    Route::get('/reservas', [ReservaController::class, 'index'])->name('reservas.index');
+    Route::get('/reservas/create', [ReservaController::class, 'create'])->name('reservas.create');
+    Route::post('/reservas', [ReservaController::class, 'store'])->name('reservas.store');
+    Route::post('/reservas/check', [ReservaController::class, 'checkDisponibilidade'])->name('reservas.check');
+    Route::post('/reservas/preview', [ReservaController::class, 'preview'])->name('reservas.preview');
+    Route::put('/reservas/{id}/cancelar', [ReservaController::class, 'cancelar'])->name('reservas.cancelar');
+    Route::get('/reservas/{id}', [ReservaController::class, 'show'])->name('reservas.show');
 });
 
-
-// Só funcionãrios
+// Só funcionários e admins
 Route::middleware(['auth', 'isFuncionario'])->group(function () {
 
-    // RESERVAS ADMIN
-    Route::get('/reservas/{id}/edit', [ReservaController::class, 'edit']);
-    Route::put('/reservas/{id}', [ReservaController::class, 'update']);
-    Route::delete('/reservas/{id}', [ReservaController::class, 'destroy']);
-    Route::put('/reservas/{id}/concluir', [ReservaController::class, 'concluir']);
+    Route::get('/reservas/{id}/edit', [ReservaController::class, 'edit'])->name('reservas.edit');
+    Route::put('/reservas/{id}', [ReservaController::class, 'update'])->name('reservas.update');
+    Route::put('/reservas/{id}/concluir', [ReservaController::class, 'concluir'])->name('reservas.concluir');
 
-    // VEICULOS
-    Route::get('/veiculos', [VeiculoController::class, 'index']);
-    Route::get('/veiculos/create', [VeiculoController::class, 'create']);
-    Route::post('/veiculos', [VeiculoController::class, 'store']);
-    Route::get('/veiculos/{id_veiculo}/edit', [VeiculoController::class, 'edit']);
-    Route::put('/veiculos/{id_veiculo}', [VeiculoController::class, 'update']);
-    Route::delete('/veiculos/{id_veiculo}', [VeiculoController::class, 'destroy']);
+    Route::get('/veiculos', [VeiculoController::class, 'index'])->name('veiculos.index');
+    Route::get('/veiculos/create', [VeiculoController::class, 'create'])->name('veiculos.create');
+    Route::post('/veiculos', [VeiculoController::class, 'store'])->name('veiculos.store');
+    Route::get('/veiculos/{id_veiculo}/edit', [VeiculoController::class, 'edit'])->name('veiculos.edit');
+    Route::put('/veiculos/{id_veiculo}', [VeiculoController::class, 'update'])->name('veiculos.update');
+    Route::delete('/veiculos/{id_veiculo}', [VeiculoController::class, 'destroy'])->name('veiculos.destroy');
+});
+
+// Só admin
+Route::middleware(['auth', 'isAdmin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('index');
+    Route::put('/users/{id}/promover', [AdminController::class, 'promoverFuncionario'])->name('promover');
+    Route::put('/users/{id}/revogar', [AdminController::class, 'revogarFuncionario'])->name('revogar');
+    Route::delete('/users/{id}', [AdminController::class, 'destroy'])->name('destroy');
 });
 
 require __DIR__.'/auth.php';
