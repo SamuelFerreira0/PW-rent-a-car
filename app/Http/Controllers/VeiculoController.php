@@ -39,7 +39,7 @@ class VeiculoController extends Controller
 
         Veiculo::create($dadosValidados);
 
-        return redirect('/veiculos')->with('success', 'Veiculo criado com sucesso');
+        return redirect()->route('veiculos.index')->with('success', 'Veiculo criado com sucesso');
     }
 
     public function edit($id_veiculo)
@@ -62,7 +62,7 @@ class VeiculoController extends Controller
         $veiculo = Veiculo::findOrFail($id_veiculo);
         $veiculo->update($dadosValidados);
 
-        return redirect('/veiculos')->with('success', 'Veiculo atualizado com sucesso');
+        return redirect()->route('veiculos.index')->with('success', 'Veiculo atualizado com sucesso');
     }
 
     public function destroy($id_veiculo)
@@ -72,12 +72,14 @@ class VeiculoController extends Controller
         $temReservas = Reserva::where('id_veiculo', $id_veiculo)->exists();
 
         if ($temReservas) {
-            return redirect('/veiculos')->withErrors('Nao e possivel eliminar um veiculo com reservas associadas.');
+            return redirect()->route('veiculos.index')->withErrors(
+                'Não é possível eliminar este veículo porque existem reservas associadas no histórico.'
+            );
         }
 
         $veiculo->delete();
 
-        return redirect('/veiculos')->with('success', 'Veiculo eliminado com sucesso');
+        return redirect()->route('veiculos.index')->with('success', 'Veiculo eliminado com sucesso');
     }
 
     private function validationRules(?int $idVeiculo = null): array

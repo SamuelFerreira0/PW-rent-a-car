@@ -10,8 +10,8 @@
                 {{ $veiculo->marca }} {{ $veiculo->modelo }} · {{ $veiculo->matricula }}
             </p>
         </div>
-        <a href="/veiculos"
-           class="text-xs font-semibold text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-300 bg-white px-4 py-2 rounded-xl transition-colors">
+        <a href="{{ route('veiculos.index') }}"
+           class="text-xs font-semibold text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-300 bg-white px-4 py-2 rounded-xl transition-all duration-150">
             ← Voltar
         </a>
     </div>
@@ -29,48 +29,50 @@
     @endif
 
     {{-- FORM CARD --}}
-    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-        <form method="POST" action="/veiculos/{{ $veiculo->id_veiculo }}">
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden"
+         style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
+        <form method="POST" action="{{ route('veiculos.update', $veiculo->id_veiculo) }}">
             @csrf
             @method('PUT')
 
             <div class="p-6 flex flex-col gap-5">
 
-                {{-- MATRÍCULA --}}
                 <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                         Matrícula
                     </label>
                     <input type="text" name="matricula" value="{{ old('matricula', $veiculo->matricula) }}" required
-                           class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                           class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                  shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                 </div>
 
-                {{-- MARCA + MODELO --}}
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                             Marca
                         </label>
                         <input type="text" name="marca" value="{{ old('marca', $veiculo->marca) }}" required
-                               class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                               class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                      shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                             Modelo
                         </label>
                         <input type="text" name="modelo" value="{{ old('modelo', $veiculo->modelo) }}" required
-                               class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                               class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                      shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                     </div>
                 </div>
 
-                {{-- CATEGORIA + ESTADO --}}
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                             Categoria
                         </label>
                         <select name="id_categoria" required
-                                class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                                class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                       shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             <option value="">Selecionar...</option>
                             @foreach($categorias as $categoria)
                                 <option value="{{ $categoria->id_categoria }}" @selected(old('id_categoria', $veiculo->id_categoria) == $categoria->id_categoria)>
@@ -80,11 +82,12 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                             Estado
                         </label>
                         <select name="id_estado_veiculo" required
-                                class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                                class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                       shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                             <option value="">Selecionar...</option>
                             @foreach($estadosVeiculo as $estado)
                                 <option value="{{ $estado->id_estado_veiculo }}" @selected(old('id_estado_veiculo', $veiculo->id_estado_veiculo) == $estado->id_estado_veiculo)>
@@ -95,13 +98,13 @@
                     </div>
                 </div>
 
-                {{-- LOCALIZAÇÃO --}}
                 <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                         Localização
                     </label>
                     <select name="id_localizacao" required
-                            class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                            class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                   shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                         <option value="">Selecionar...</option>
                         @foreach($localizacoes as $localizacao)
                             <option value="{{ $localizacao->id_localizacao }}" @selected(old('id_localizacao', $veiculo->id_localizacao) == $localizacao->id_localizacao)>
@@ -111,23 +114,22 @@
                     </select>
                 </div>
 
-                {{-- PREÇO --}}
                 <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                         Preço diário (€)
                     </label>
                     <input type="number" name="preco_diario" step="0.01" min="0.01" value="{{ old('preco_diario', $veiculo->preco_diario) }}" required
-                           class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                           class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                  shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                 </div>
 
             </div>
 
-            {{-- FOOTER --}}
             <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100" style="background:#fafbfc;">
                 <p class="text-xs text-slate-400">Veículo #{{ $veiculo->id_veiculo }}</p>
                 <button type="submit"
-                        class="text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl transition-colors"
-                        style="background:#1e40af;">
+                        class="text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl transition-all duration-150 hover:-translate-y-px"
+                        style="background:linear-gradient(135deg,#2563eb 0%,#1e40af 100%); box-shadow:0 2px 8px rgba(30,64,175,0.25);">
                     Guardar alterações
                 </button>
             </div>
