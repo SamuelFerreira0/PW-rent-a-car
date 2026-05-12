@@ -13,24 +13,48 @@ class ReservaController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->funcionario) {
+        $user = auth()->user();
+
+        if ($user->isFuncionarioOrAdmin()) {
             $reservas = Reserva::with('cliente', 'veiculo')
+                ->orderByRaw('CASE WHEN id_estado_reserva = ' . Reserva::ESTADO_ATIVA . ' THEN 0 ELSE 1 END')
                 ->orderBy('id_reserva', 'desc')
                 ->paginate(10);
+
+            $statsAtivas     = Reserva::where('id_estado_reserva', Reserva::ESTADO_ATIVA)->count();
+            $statsConcluidas = Reserva::where('id_estado_reserva', Reserva::ESTADO_CONCLUIDA)->count();
+            $statsCanceladas = Reserva::where('id_estado_reserva', Reserva::ESTADO_CANCELADA)->count();
+            $totalCusto      = Reserva::sum('custo_total');
         } else {
-            $reservas = Reserva::where('id_cliente', auth()->user()->cliente->id_cliente)
+            $clienteId = $user->clienteId();
+            abort_if(!$clienteId, 403, 'Perfil de cliente não encontrado.');
+
+            $reservas = Reserva::where('id_cliente', $clienteId)
                 ->with('veiculo')
+                ->orderByRaw('CASE WHEN id_estado_reserva = ' . Reserva::ESTADO_ATIVA . ' THEN 0 ELSE 1 END')
                 ->orderBy('id_reserva', 'desc')
                 ->paginate(10);
+
+            $statsAtivas     = Reserva::where('id_cliente', $clienteId)->where('id_estado_reserva', Reserva::ESTADO_ATIVA)->count();
+            $statsConcluidas = Reserva::where('id_cliente', $clienteId)->where('id_estado_reserva', Reserva::ESTADO_CONCLUIDA)->count();
+            $statsCanceladas = Reserva::where('id_cliente', $clienteId)->where('id_estado_reserva', Reserva::ESTADO_CANCELADA)->count();
+            $totalCusto      = Reserva::where('id_cliente', $clienteId)->sum('custo_total');
         }
-    
-        return view('reservas.index', compact('reservas'));
+
+        $collection = $reservas->getCollection();
+        $ativas    = $collection->filter(fn($r) => $r->isAtiva())->values();
+        $historico = $collection->filter(fn($r) => !$r->isAtiva())->values();
+
+        return view('reservas.index', compact(
+            'reservas', 'ativas', 'historico',
+            'statsAtivas', 'statsConcluidas', 'statsCanceladas', 'totalCusto'
+        ));
     }
 
     public function create()
     {
         $agora = now();
-    
+
         $veiculos = Veiculo::whereDoesntHave('reservas', function ($query) use ($agora) {
             $query->where('id_estado_reserva', Reserva::ESTADO_ATIVA)
                 ->where(function ($q) use ($agora) {
@@ -38,23 +62,30 @@ class ReservaController extends Controller
                       ->where('data_prevista', '>=', $agora);
                 });
         })->get();
-    
-        $clientes = auth()->user()->funcionario
+
+        $clientes = auth()->user()->isFuncionarioOrAdmin()
             ? Cliente::all()
             : null;
-    
-        return view('reservas.create', compact('clientes', 'veiculos'));
+
+        $veiculoPreSelecionado = request()->query('veiculo');
+
+        return view('reservas.create', compact('clientes', 'veiculos', 'veiculoPreSelecionado'));
     }
 
     public function store(Request $request)
     {
+        $user = auth()->user();
         $request->validate($this->validationRules(), $this->validationMessages());
 
         $dataInicio = Carbon::parse($request->data_reserva);
-        $dataFim = Carbon::parse($request->data_prevista);
+        $dataFim    = Carbon::parse($request->data_prevista);
 
         if ($dataInicio->lt(now())) {
             return back()->withInput()->withErrors('Data de início não pode ser no passado.');
+        }
+
+        if (!$user->isFuncionarioOrAdmin()) {
+            abort_if(!$user->clienteId(), 403, 'Perfil de cliente não encontrado.');
         }
 
         DB::beginTransaction();
@@ -74,37 +105,32 @@ class ReservaController extends Controller
             $custoTotal = Reserva::calcularCusto($dataInicio, $dataFim, $precoDiarioUsado);
 
             Reserva::create([
-                'id_cliente' => auth()->user()->funcionario
-                ? $request->id_cliente
-                    : auth()->user()->cliente->id_cliente,
-                'id_veiculo' => $request->id_veiculo,
-                'data_reserva' => $dataInicio,
-                'data_prevista' => $dataFim,
+                'id_cliente'        => $user->isFuncionarioOrAdmin() ? $request->id_cliente : $user->clienteId(),
+                'id_veiculo'        => $request->id_veiculo,
+                'data_reserva'      => $dataInicio,
+                'data_prevista'     => $dataFim,
                 'id_estado_reserva' => Reserva::ESTADO_ATIVA,
                 'preco_diario_usado' => $precoDiarioUsado,
-                'custo_total' => $custoTotal,
+                'custo_total'       => $custoTotal,
             ]);
 
             DB::commit();
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->withErrors($e->getMessage());
         }
 
-        return redirect('/reservas')->with('success', 'Reserva criada com sucesso');
+        return redirect()->route('reservas.index')->with('success', 'Reserva criada com sucesso');
     }
 
     public function edit($id)
     {
-        if (!auth()->user()->funcionario) {
-            abort(403);
-        }
+        abort_unless(auth()->user()->isFuncionarioOrAdmin(), 403);
 
         $reserva = Reserva::findOrFail($id);
 
-        if ($reserva->isConcluida()) {
-            return back()->withErrors('Não é possível editar uma reserva concluída.');
+        if ($reserva->isConcluida() || $reserva->isCancelada()) {
+            return back()->withErrors('Não é possível editar esta reserva.');
         }
 
         $clientes = Cliente::all();
@@ -115,36 +141,24 @@ class ReservaController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!auth()->user()->funcionario) {
-            abort(403);
-        }
-        
+        abort_unless(auth()->user()->isFuncionarioOrAdmin(), 403);
+
         $reserva = Reserva::findOrFail($id);
 
-        if ($reserva->isConcluida()) {
-            return back()->withInput()->withErrors('Não é possível alterar uma reserva concluída.');
+        if ($reserva->isConcluida() || $reserva->isCancelada()) {
+            return back()->withInput()->withErrors('Não é possível alterar esta reserva.');
         }
 
         $request->validate($this->validationRules(), $this->validationMessages());
 
         $dataInicio = Carbon::parse($request->data_reserva);
-        $dataFim = Carbon::parse($request->data_prevista);
+        $dataFim    = Carbon::parse($request->data_prevista);
 
         if ($dataInicio->lt(now())) {
             return back()->withInput()->withErrors('Data de início não pode ser no passado.');
         }
 
-        if (Reserva::temConflito(
-            $request->id_veiculo,
-            $dataInicio,
-            $dataFim,
-            $reserva->id_reserva
-        )) {
-            return back()->withInput()->withErrors('Veículo já está reservado nesse período');
-        }
-
         $veiculo = Veiculo::findOrFail($request->id_veiculo);
-
         $precoDiarioUsado = (float) $reserva->preco_diario_usado;
 
         if ((int) $reserva->id_veiculo !== (int) $request->id_veiculo || $precoDiarioUsado <= 0) {
@@ -155,93 +169,88 @@ class ReservaController extends Controller
             return back()->withInput()->withErrors('Preço do veículo inválido.');
         }
 
+        DB::beginTransaction();
+
         try {
+            if (Reserva::temConflito($request->id_veiculo, $dataInicio, $dataFim, $reserva->id_reserva)) {
+                throw new \Exception('Veículo já está reservado nesse período');
+            }
+
             $custoTotal = Reserva::calcularCusto($dataInicio, $dataFim, $precoDiarioUsado);
+
+            $reserva->update([
+                'id_cliente'        => $request->id_cliente,
+                'id_veiculo'        => $request->id_veiculo,
+                'data_reserva'      => $dataInicio,
+                'data_prevista'     => $dataFim,
+                'preco_diario_usado' => $precoDiarioUsado,
+                'custo_total'       => $custoTotal,
+            ]);
+
+            DB::commit();
         } catch (\Exception $e) {
-            return back()->withInput()->withErrors('Erro ao calcular custo da reserva.');
+            DB::rollBack();
+            return back()->withInput()->withErrors($e->getMessage());
         }
 
-        $reserva->update([
-            'id_cliente' => auth()->user()->funcionario
-                ? $request->id_cliente
-                : auth()->user()->cliente->id_cliente,
-            'id_veiculo' => $request->id_veiculo,
-            'data_reserva' => $dataInicio,
-            'data_prevista' => $dataFim,
-            'preco_diario_usado' => $precoDiarioUsado,
-            'custo_total' => $custoTotal,
-        ]);
-
-        return redirect('/reservas')->with('success', 'Reserva atualizada');
-    }
-
-    public function destroy($id)
-    {
-        if (!auth()->user()->funcionario) {
-            abort(403);
-        }
-
-        $reserva = Reserva::findOrFail($id);
-
-        if ($reserva->isConcluida()) {
-            return back()->withErrors('Não é possível eliminar uma reserva concluída.');
-        }
-
-        $reserva->delete();
-
-        return redirect('/reservas')->with('success', 'Reserva eliminada');
+        return redirect()->route('reservas.index')->with('success', 'Reserva atualizada');
     }
 
     public function concluir($id)
     {
-        if (!auth()->user()->funcionario) {
-            abort(403);
-        }
+        abort_unless(auth()->user()->isFuncionarioOrAdmin(), 403);
 
         $reserva = Reserva::findOrFail($id);
 
-        if ($reserva->isConcluida()) {
-            return redirect('/reservas')->withErrors('A reserva já está concluída');
+        if ($reserva->isConcluida() || $reserva->isCancelada()) {
+            return redirect()->route('reservas.index')->withErrors('Não é possível concluir esta reserva.');
         }
 
         $reserva->id_estado_reserva = Reserva::ESTADO_CONCLUIDA;
         $reserva->save();
 
-        return redirect('/reservas')->with('success', 'Reserva concluída');
+        return redirect()->route('reservas.index')->with('success', 'Reserva concluída');
     }
 
-    private function validationRules(): array
+    public function cancelar($id)
     {
-        $rules = [
-            'id_veiculo' => 'required|exists:veiculo,id_veiculo',
-            'data_reserva' => 'required|date',
-            'data_prevista' => 'required|date|after:data_reserva',
-        ];
-    
-        if (auth()->user()->funcionario) {
-            $rules['id_cliente'] = 'required|exists:cliente,id_cliente';
+        $user    = auth()->user();
+        $reserva = Reserva::findOrFail($id);
+
+        if (!$user->isFuncionarioOrAdmin()) {
+            $clienteId = $user->clienteId();
+            abort_if(!$clienteId || $reserva->id_cliente !== $clienteId, 403);
         }
-    
-        return $rules;
+
+        if (!$reserva->isAtiva()) {
+            return back()->withErrors('Só é possível cancelar reservas ativas.');
+        }
+
+        $reserva->id_estado_reserva = Reserva::ESTADO_CANCELADA;
+        $reserva->save();
+
+        return redirect()->route('reservas.index')->with('success', 'Reserva cancelada.');
     }
 
-    private function validationMessages(): array
+    public function show($id)
     {
-        return [
-            'id_cliente.required' => 'Tem de selecionar um cliente.',
-            'id_veiculo.required' => 'Tem de selecionar um veículo.',
-            'data_reserva.required' => 'A data de início é obrigatória.',
-            'data_prevista.required' => 'A data de fim é obrigatória.',
-            'data_prevista.after' => 'A data de fim tem de ser depois da data de início.',
-        ];
+        $user    = auth()->user();
+        $reserva = Reserva::with('veiculo', 'cliente')->findOrFail($id);
+
+        if (!$user->isFuncionarioOrAdmin()) {
+            $clienteId = $user->clienteId();
+            abort_if(!$clienteId || $reserva->id_cliente !== $clienteId, 403, 'Acesso não autorizado.');
+        }
+
+        return view('reservas.show', compact('reserva'));
     }
 
     public function checkDisponibilidade(Request $request)
     {
         $request->validate([
-            'id_veiculo' => 'required',
+            'id_veiculo'   => 'required|exists:veiculo,id_veiculo',
             'data_reserva' => 'required|date',
-            'data_prevista' => 'required|date',
+            'data_prevista' => 'required|date|after:data_reserva',
         ]);
 
         $conflito = Reserva::temConflito(
@@ -250,46 +259,54 @@ class ReservaController extends Controller
             $request->data_prevista
         );
 
-        return response()->json([
-            'disponivel' => !$conflito
-        ]);
+        return response()->json(['disponivel' => !$conflito]);
     }
 
     public function preview(Request $request)
     {
+        $request->validate([
+            'id_veiculo'   => 'required|exists:veiculo,id_veiculo',
+            'data_reserva' => 'required|date',
+            'data_prevista' => 'required|date|after:data_reserva',
+        ]);
+
         try {
-            $dataInicio = $request->data_reserva;
-            $dataFim = $request->data_prevista;
-    
             $veiculo = Veiculo::findOrFail($request->id_veiculo);
-    
-            $custo = Reserva::calcularCusto(
-                $dataInicio,
-                $dataFim,
+            $custo   = Reserva::calcularCusto(
+                $request->data_reserva,
+                $request->data_prevista,
                 $veiculo->preco_diario
             );
-    
-            return response()->json([
-                'success' => true,
-                'custo' => $custo
-            ]);
-    
+
+            return response()->json(['success' => true, 'custo' => $custo]);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false
-            ]);
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 
-    public function show($id)
+    private function validationRules(): array
     {
-        $reserva = Reserva::with('veiculo', 'cliente')->findOrFail($id);
+        $rules = [
+            'id_veiculo'   => 'required|exists:veiculo,id_veiculo',
+            'data_reserva' => 'required|date',
+            'data_prevista' => 'required|date|after:data_reserva',
+        ];
 
-        if (!auth()->user()->funcionario &&
-            $reserva->id_cliente !== auth()->user()->cliente->id_cliente) {
-            abort(403, 'Acesso não autorizado.');
+        if (auth()->user()->isFuncionarioOrAdmin()) {
+            $rules['id_cliente'] = 'required|exists:cliente,id_cliente';
         }
 
-        return view('reservas.show', compact('reserva'));
+        return $rules;
+    }
+
+    private function validationMessages(): array
+    {
+        return [
+            'id_cliente.required'   => 'Tem de selecionar um cliente.',
+            'id_veiculo.required'   => 'Tem de selecionar um veículo.',
+            'data_reserva.required' => 'A data de início é obrigatória.',
+            'data_prevista.required' => 'A data de fim é obrigatória.',
+            'data_prevista.after'   => 'A data de fim tem de ser depois da data de início.',
+        ];
     }
 }

@@ -9,6 +9,7 @@ class Reserva extends Model
 {
     public const ESTADO_ATIVA = 1;
     public const ESTADO_CONCLUIDA = 2;
+    public const ESTADO_CANCELADA = 3;
 
     protected $table = 'reserva';
     protected $primaryKey = 'id_reserva';
@@ -34,9 +35,19 @@ class Reserva extends Model
         return $this->belongsTo(Veiculo::class, 'id_veiculo', 'id_veiculo');
     }
 
+    public function isAtiva(): bool
+    {
+        return (int) $this->id_estado_reserva === self::ESTADO_ATIVA;
+    }
+
     public function isConcluida(): bool
     {
         return (int) $this->id_estado_reserva === self::ESTADO_CONCLUIDA;
+    }
+
+    public function isCancelada(): bool
+    {
+        return (int) $this->id_estado_reserva === self::ESTADO_CANCELADA;
     }
 
     public static function calcularCusto($dataInicio, $dataFim, $precoDiario): float
