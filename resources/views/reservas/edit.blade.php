@@ -10,8 +10,8 @@
                 {{ $reserva->veiculo->marca }} {{ $reserva->veiculo->modelo }} · {{ $reserva->cliente->nome }}
             </p>
         </div>
-        <a href="/reservas"
-           class="text-xs font-semibold text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-300 bg-white px-4 py-2 rounded-xl transition-colors">
+        <a href="{{ route('reservas.index') }}"
+           class="text-xs font-semibold text-slate-500 hover:text-slate-900 border border-slate-200 hover:border-slate-300 bg-white px-4 py-2 rounded-xl transition-all duration-150">
             ← Voltar
         </a>
     </div>
@@ -29,9 +29,10 @@
     @endif
 
     {{-- FORM CARD --}}
-    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden"
+         style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
 
-        <form method="POST" action="/reservas/{{ $reserva->id_reserva }}">
+        <form method="POST" action="{{ route('reservas.update', $reserva->id_reserva) }}">
             @csrf
             @method('PUT')
 
@@ -39,14 +40,15 @@
 
                 {{-- CLIENTE --}}
                 <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                         Cliente
                     </label>
                     <select name="id_cliente"
-                            class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                            class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                   shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                         @foreach($clientes as $cliente)
                             <option value="{{ $cliente->id_cliente }}"
-                                {{ $reserva->id_cliente == $cliente->id_cliente ? 'selected' : '' }}>
+                                {{ old('id_cliente', $reserva->id_cliente) == $cliente->id_cliente ? 'selected' : '' }}>
                                 {{ $cliente->nome }}
                             </option>
                         @endforeach
@@ -55,14 +57,15 @@
 
                 {{-- VEÍCULO --}}
                 <div>
-                    <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                         Veículo
                     </label>
                     <select name="id_veiculo"
-                            class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                            class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                   shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                         @foreach($veiculos as $veiculo)
                             <option value="{{ $veiculo->id_veiculo }}"
-                                {{ $reserva->id_veiculo == $veiculo->id_veiculo ? 'selected' : '' }}>
+                                {{ old('id_veiculo', $reserva->id_veiculo) == $veiculo->id_veiculo ? 'selected' : '' }}>
                                 {{ $veiculo->marca }} {{ $veiculo->modelo }}
                             </option>
                         @endforeach
@@ -72,20 +75,22 @@
                 {{-- DATAS --}}
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                             Início
                         </label>
                         <input type="datetime-local" name="data_reserva"
-                               value="{{ \Carbon\Carbon::parse($reserva->data_reserva)->format('Y-m-d\TH:i') }}"
-                               class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                               value="{{ old('data_reserva', \Carbon\Carbon::parse($reserva->data_reserva)->format('Y-m-d\TH:i')) }}"
+                               class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                      shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
                             Fim
                         </label>
                         <input type="datetime-local" name="data_prevista"
-                               value="{{ \Carbon\Carbon::parse($reserva->data_prevista)->format('Y-m-d\TH:i') }}"
-                               class="w-full px-4 py-2.5 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition">
+                               value="{{ old('data_prevista', \Carbon\Carbon::parse($reserva->data_prevista)->format('Y-m-d\TH:i')) }}"
+                               class="w-full px-4 py-2.5 text-sm text-slate-800 bg-white border border-slate-200 rounded-xl transition-all duration-150
+                                      shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
                     </div>
                 </div>
 
@@ -93,12 +98,10 @@
 
             {{-- FOOTER DO CARD --}}
             <div class="flex items-center justify-between px-6 py-4 border-t border-slate-100" style="background:#fafbfc;">
-                <p class="text-xs text-slate-400">
-                    Reserva #{{ $reserva->id_reserva }}
-                </p>
+                <p class="text-xs text-slate-400">Reserva #{{ $reserva->id_reserva }}</p>
                 <button type="submit"
-                        class="text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl transition-colors"
-                        style="background:#1e40af;">
+                        class="text-white text-[13px] font-semibold px-6 py-2.5 rounded-xl transition-all duration-150 hover:-translate-y-px"
+                        style="background:linear-gradient(135deg,#2563eb 0%,#1e40af 100%); box-shadow:0 2px 8px rgba(30,64,175,0.25);">
                     Guardar alterações
                 </button>
             </div>
