@@ -227,44 +227,43 @@
     {{-- STATS --}}
     @if(auth()->user()->isFuncionarioOrAdmin())
 
-    <div class="grid gap-3 mb-3 grid-cols-1 sm:grid-cols-3">
-        <div class="bg-white rounded-2xl border border-slate-200 p-4"
+    <div class="grid gap-3 mb-6 grid-cols-2 sm:grid-cols-4">
+        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
              style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Ativas</p>
+            <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Ativas</p>
             <p class="text-xl font-bold text-emerald-600">{{ $ativas ?? 0 }}</p>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-4"
+        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
              style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Concluídas</p>
+            <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Concluídas</p>
             <p class="text-xl font-bold text-slate-800">{{ $concluidas ?? 0 }}</p>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-4"
+        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
              style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Canceladas</p>
+            <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Canceladas</p>
             <p class="text-xl font-bold text-red-500">{{ $canceladas ?? 0 }}</p>
         </div>
-    </div>
-
-    <div class="bg-white rounded-2xl border border-slate-200 p-4 mb-6 flex items-center justify-between"
-         style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-        <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Receita total</p>
-        <p class="text-xl font-bold" style="color:#1e40af;">
-            € {{ number_format($receita ?? 0, 2, ',', '.') }}
-        </p>
+        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
+             style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
+            <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Receita total</p>
+            <p class="text-xl font-bold" style="color:#1e40af;">
+                € {{ number_format($receita ?? 0, 2, ',', '.') }}
+            </p>
+        </div>
     </div>
 
     @else
 
-    <div class="grid gap-3 mb-6">
-        <div class="bg-white rounded-2xl border border-slate-200 p-4"
+    <div class="grid gap-3 mb-6 grid-cols-1 sm:grid-cols-2">
+        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
              style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Total de Reservas</p>
+            <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Total de Reservas</p>
             <p class="text-xl font-bold text-slate-900">{{ $total ?? 0 }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl border border-slate-200 p-4"
+        <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
              style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Próxima Reserva</p>
+            <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Próxima Reserva</p>
             @if(isset($proxima) && $proxima)
                 <p class="font-semibold text-slate-900">
                     {{ \Carbon\Carbon::parse($proxima->data_reserva)->format('d/m/Y H:i') }}

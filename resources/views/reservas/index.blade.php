@@ -24,26 +24,26 @@
 
         {{-- STATS --}}
         <div class="grid gap-3 mb-6 grid-cols-2 sm:grid-cols-4">
-            <div class="bg-white rounded-xl border border-slate-200 p-4"
+            <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
                  style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Valor total</p>
+                <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Valor total</p>
                 <p class="text-lg font-bold" style="color:#1e40af;">
                     € {{ number_format($totalCusto, 2, ',', '.') }}
                 </p>
             </div>
-            <div class="bg-white rounded-xl border border-slate-200 p-4"
+            <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
                  style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Ativas</p>
+                <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Ativas</p>
                 <p class="text-xl font-bold text-emerald-600">{{ $statsAtivas }}</p>
             </div>
-            <div class="bg-white rounded-xl border border-slate-200 p-4"
+            <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
                  style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Concluídas</p>
+                <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Concluídas</p>
                 <p class="text-xl font-bold text-slate-800">{{ $statsConcluidas }}</p>
             </div>
-            <div class="bg-white rounded-xl border border-slate-200 p-4"
+            <div class="bg-white rounded-xl border border-slate-200 px-4 py-3"
                  style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
-                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">Canceladas</p>
+                <p class="text-[10px] uppercase tracking-wide text-slate-400 font-semibold mb-0.5">Canceladas</p>
                 <p class="text-xl font-bold text-red-500">{{ $statsCanceladas }}</p>
             </div>
         </div>

@@ -52,116 +52,79 @@
     </nav>
 @endauth
 
-<div class="max-w-5xl mx-auto px-4 py-8">
+<div class="max-w-5xl mx-auto px-4 py-6">
 
     {{-- HEADER --}}
-    <div class="flex justify-between items-end mb-8">
+    <div class="flex justify-between items-center mb-5">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Catálogo de Veículos</h1>
-            <p class="text-sm text-slate-400 mt-1">
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Catálogo de Veículos</h1>
+            <p class="text-sm text-slate-400 mt-0.5">
                 {{ $veiculos->count() }} {{ $veiculos->count() === 1 ? 'veículo disponível' : 'veículos disponíveis' }}
             </p>
         </div>
         @guest
-        <div class="hidden sm:flex items-center gap-2 text-xs text-slate-400">
-            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-            <span>É necessário <a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">iniciar sessão</a> para reservar</span>
-        </div>
+        <p class="hidden sm:block text-xs text-slate-400">
+            <a href="{{ route('login') }}" class="text-blue-600 font-semibold hover:underline">Inicie sessão</a> para reservar
+        </p>
         @endguest
     </div>
 
     {{-- GRID DE VEÍCULOS --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         @forelse($veiculos as $veiculo)
 
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all duration-150 hover:-translate-y-0.5"
-             style="box-shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);">
+        <div class="bg-white rounded-xl border border-slate-200 transition-colors duration-150 hover:border-blue-200 hover:bg-slate-50/50">
 
-            {{-- BANNER --}}
-            <div class="h-28 flex items-end px-4 pb-3 relative overflow-hidden"
-                 style="background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 60%,#3b82f6 100%);">
-                <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-16 h-16 text-white/10"
-                     fill="none" stroke="currentColor" stroke-width="0.8" viewBox="0 0 24 24">
-                    <path d="M5 17H3a2 2 0 01-2-2v-4l3-6h12l3 6v4a2 2 0 01-2 2h-2M5 17a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z"/>
-                </svg>
-                <div class="absolute top-3 right-3">
-                    <span class="text-[11px] font-semibold text-white/80 bg-white/10 px-2 py-0.5 rounded-full">
-                        {{ $veiculo->matricula }}
-                    </span>
-                </div>
-                <div>
-                    <p class="text-white font-bold text-[15px] tracking-tight leading-none">
-                        {{ $veiculo->marca }} {{ $veiculo->modelo }}
-                    </p>
-                    <p class="text-blue-200 text-[11px] mt-0.5">
-                        {{ $veiculo->categoria->nome_categoria ?? $veiculo->categoria->nome ?? '—' }}
+            <div class="px-4 pt-3 pb-2.5">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <p class="font-semibold text-sm text-slate-900 truncate">{{ $veiculo->marca }} {{ $veiculo->modelo }}</p>
+                        <span class="text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded font-mono flex-shrink-0">{{ $veiculo->matricula }}</span>
+                    </div>
+                    <p class="text-sm font-bold text-slate-800 flex-shrink-0 tabular-nums">
+                        € {{ number_format($veiculo->preco_diario, 2, ',', '.') }}<span class="text-xs font-normal text-slate-400">/dia</span>
                     </p>
                 </div>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    {{ $veiculo->categoria->nome_categoria ?? $veiculo->categoria->nome ?? '—' }}
+                    <span class="mx-1">·</span>
+                    {{ $veiculo->estadoVeiculo->nome ?? '—' }}
+                    <span class="mx-1">·</span>
+                    {{ $veiculo->localizacao->nome ?? '—' }}
+                </p>
             </div>
 
-            {{-- CORPO --}}
-            <div class="px-4 pt-4 pb-3 flex flex-col gap-3">
-
-                {{-- DETALHES --}}
-                <div class="grid grid-cols-2 gap-x-4 gap-y-2.5">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest text-slate-300 font-semibold">Estado</p>
-                        <p class="text-[13px] text-slate-700 font-medium mt-0.5">
-                            {{ $veiculo->estadoVeiculo->nome ?? '—' }}
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest text-slate-300 font-semibold">Localização</p>
-                        <p class="text-[13px] text-slate-700 font-medium mt-0.5">
-                            {{ $veiculo->localizacao->nome ?? '—' }}
-                        </p>
-                    </div>
-                </div>
-
-                {{-- PREÇO --}}
-                <div class="flex items-center justify-between pt-2.5 border-t border-slate-100">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-widest text-slate-300 font-semibold">Preço / dia</p>
-                        <p class="text-xl font-bold text-slate-900 tracking-tight mt-0.5">
-                            € {{ number_format($veiculo->preco_diario, 2, ',', '.') }}
-                        </p>
-                    </div>
-
-                    {{-- CTA --}}
-                    @guest
-                        <a href="{{ route('login') }}"
-                           class="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-100 px-3 py-2 rounded-xl transition-all duration-150">
-                            Reservar →
+            <div class="flex items-center justify-end px-3 py-1.5 border-t border-slate-100 bg-slate-50/50">
+                @guest
+                    <a href="{{ route('login') }}"
+                       class="text-xs font-semibold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-300 bg-white hover:bg-blue-50 px-3 py-1 rounded-lg transition-colors">
+                        Reservar →
+                    </a>
+                @else
+                    @if(auth()->user()->isFuncionarioOrAdmin())
+                        <a href="{{ route('veiculos.edit', $veiculo->id_veiculo) }}"
+                           class="text-xs font-medium text-slate-500 hover:text-slate-900 hover:bg-white border border-transparent hover:border-slate-200 px-3 py-1 rounded-lg transition-colors">
+                            Editar
                         </a>
                     @else
-                        @if(auth()->user()->isFuncionarioOrAdmin())
-                            <a href="{{ route('veiculos.edit', $veiculo->id_veiculo) }}"
-                               class="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3 py-2 rounded-xl transition-all duration-150">
-                                Editar
-                            </a>
-                        @else
-                            <a href="{{ route('reservas.create', ['veiculo' => $veiculo->id_veiculo]) }}"
-                               class="text-xs font-semibold text-white px-3 py-2 rounded-xl transition-all duration-150 hover:-translate-y-px"
-                               style="background:linear-gradient(135deg,#2563eb 0%,#1e40af 100%); box-shadow:0 2px 6px rgba(30,64,175,0.2);">
-                                Reservar →
-                            </a>
-                        @endif
-                    @endguest
-                </div>
-
+                        <a href="{{ route('reservas.create', ['veiculo' => $veiculo->id_veiculo]) }}"
+                           class="text-xs font-semibold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-300 bg-white hover:bg-blue-50 px-3 py-1 rounded-lg transition-colors">
+                            Reservar →
+                        </a>
+                    @endif
+                @endguest
             </div>
+
         </div>
 
         @empty
-        <div class="col-span-3 text-center py-20">
-            <div class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style="background:#eff6ff;">
-                <svg class="w-6 h-6" fill="none" stroke="#2563eb" stroke-width="1.8" viewBox="0 0 24 24">
+        <div class="col-span-full text-center py-16">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 bg-slate-100">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path d="M5 17H3a2 2 0 01-2-2v-4l3-6h12l3 6v4a2 2 0 01-2 2h-2M5 17a2 2 0 104 0 2 2 0 00-4 0zm10 0a2 2 0 104 0 2 2 0 00-4 0z"/>
                 </svg>
             </div>
-            <p class="text-sm font-semibold text-slate-400">Nenhum veículo disponível de momento</p>
+            <p class="text-sm font-medium text-slate-400">Nenhum veículo disponível de momento</p>
         </div>
         @endforelse
     </div>
